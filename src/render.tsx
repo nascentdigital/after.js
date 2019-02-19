@@ -1,7 +1,7 @@
 import * as React from 'react';
 import * as ReactDOMServer from 'react-dom/server';
 import Helmet from 'react-helmet';
-import { matchPath, StaticRouter } from 'react-router-dom';
+import { StaticRouter } from 'react-router-dom';
 import { Document as DefaultDoc } from './Document';
 import { After } from './After';
 import { loadInitialProps } from './loadInitialProps';
@@ -50,27 +50,23 @@ export async function render<T>(options: AfterRenderOptions<T>) {
 
     return { helmet, ...renderedContent };
   };
-
-  const { match, data } = await loadInitialProps(routes, url.parse(req.url).pathname as string, {
+  const { route, match, data } = await loadInitialProps(routes, url.parse(req.url).pathname as string, {
     req,
     res,
     ...rest
   });
 
-  if (!match) {
+  if (!route) {
     res.status(404);
     return;
   }
 
-  if (match.path === '**') {
+  if (route.path === '**') {
     res.status(404);
-  } else if (match && match.redirectTo && match.path) {
-    // @ts-ignore
-    res.redirect(301, req.originalUrl.replace(match.path, match.redirectTo));
+  } else if (route && route.redirectTo && route.path) {
+    res.redirect(301, req.originalUrl.replace(route.path, route.redirectTo));
     return;
   }
-
-  const reactRouterMatch = matchPath(req.url, match);
 
   const { html, ...docProps } = await Doc.getInitialProps({
     req,
@@ -79,7 +75,7 @@ export async function render<T>(options: AfterRenderOptions<T>) {
     renderPage,
     data,
     helmet: Helmet.renderStatic(),
-    match: reactRouterMatch,
+    match,
     ...rest
   });
 
