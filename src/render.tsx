@@ -15,7 +15,7 @@ const modPageFn = function<Props>(Page: React.ComponentType<Props>) {
 };
 
 /*
- The customRenderer parameter is a (potentially async) function that can be set to return 
+ The customRenderer parameter is a (potentially async) function that can be set to return
  more than just a rendered string.
  If present, it will be used instead of the default ReactDOMServer renderToString function.
  It has to return an object of shape { html, ... }, in which html will be used as the rendered string
@@ -65,6 +65,7 @@ export async function render<T>(options: AfterRenderOptions<T>) {
   if (match.path === '**') {
     res.status(404);
   } else if (match && match.redirectTo && match.path) {
+    // @ts-ignore
     res.redirect(301, req.originalUrl.replace(match.path, match.redirectTo));
     return;
   }
