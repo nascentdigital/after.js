@@ -20,10 +20,14 @@ export async function loadInitialProps(routes: AsyncRouteProps[], pathname: stri
     }
   });
 
+  const values = await Promise.all(promises);
+  const merged = values.reduce((prev, current) => {
+    return { ...prev, ...current }
+  }, {});
   const { route, match } = matchedRoutes[matchedRoutes.length - 1];
   return {
     match,
     route: route as AsyncRouteProps,
-    data: (await Promise.all(promises))[matchedRoutes.length - 1]
+    data: merged
   };
 }
